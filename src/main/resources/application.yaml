@@ -36,3 +36,6 @@ spring:
       web:
         exposure:
           include: health,info
+
+  jwt:
+    secret: ${JWT_SECRET}
