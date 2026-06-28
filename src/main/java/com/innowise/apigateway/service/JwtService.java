@@ -1,6 +1,7 @@
 package com.innowise.apigateway.service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,15 +15,26 @@ public class JwtService {
 
     private final SecretKey secretKey;
 
+    private static final String TOKEN_TYPE_CLAIM = "tokenType";
+
+    private static final String ACCESS_TOKEN_TYPE = "ACCESS";
+
     public JwtService(@Value("${spring.jwt.secret}") String secretKey) {
         this.secretKey = Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
-    public boolean isTokenValid(String token) {
+    public boolean isAccessTokenValid(String token) {
         try {
             Claims claims = extractAllClaims(token);
-            return claims.getExpiration() == null || claims.getExpiration().after(new Date());
-        } catch (Exception e) {
+
+            String tokenType = claims.get(TOKEN_TYPE_CLAIM, String.class);
+            Date expiration = claims.getExpiration();
+
+            return ACCESS_TOKEN_TYPE.equals(tokenType)
+                    && expiration != null
+                    && expiration.after(new Date());
+
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }

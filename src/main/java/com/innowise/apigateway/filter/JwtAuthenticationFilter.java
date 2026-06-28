@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
         String token = authorizationHeader.substring(BEARER_PREFIX.length());
 
-        if (!jwtService.isTokenValid(token)) {
+        if (!jwtService.isAccessTokenValid(token)) {
             return unauthorized(exchange);
         }
 
@@ -46,7 +46,9 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
     private boolean isPublicEndpoint(String path) {
         return path.equals("/api/auth/login")
-                || path.equals("/api/auth/register");
+                || path.equals("/api/auth/register")
+                || path.equals("/api/auth/refresh")
+                || path.equals("/api/auth/validate");
     }
 
     private Mono<Void> unauthorized(ServerWebExchange exchange) {
