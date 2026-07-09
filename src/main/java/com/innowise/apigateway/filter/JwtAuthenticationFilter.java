@@ -23,7 +23,10 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
                              org.springframework.cloud.gateway.filter.GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
 
+        System.out.println("REQUEST PATH = " + path);
+
         if (isPublicEndpoint(path)) {
+            System.out.println("PUBLIC ENDPOINT, SKIP JWT CHECK");
             return chain.filter(exchange);
         }
 
@@ -31,15 +34,25 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
                 .getHeaders()
                 .getFirst(HttpHeaders.AUTHORIZATION);
 
+        System.out.println("AUTHORIZATION HEADER = " + authorizationHeader);
+
         if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
+            System.out.println("AUTH HEADER IS MISSING OR INVALID");
             return unauthorized(exchange);
         }
 
         String token = authorizationHeader.substring(BEARER_PREFIX.length());
 
-        if (!jwtService.isAccessTokenValid(token)) {
+        boolean isValid = jwtService.isAccessTokenValid(token);
+
+        System.out.println("ACCESS TOKEN VALID = " + isValid);
+
+        if (!isValid) {
+            System.out.println("TOKEN IS INVALID");
             return unauthorized(exchange);
         }
+
+        System.out.println("TOKEN IS VALID, REQUEST PASSED");
 
         return chain.filter(exchange);
     }
