@@ -58,14 +58,20 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
     }
 
     private boolean isPublicEndpoint(String path) {
-        return path.equals("/api/auth/login")
-                || path.equals("/api/auth/register")
-                || path.equals("/api/auth/refresh")
-                || path.equals("/api/auth/validate");
+        return path.startsWith("/api/auth/login")
+                || path.startsWith("/api/auth/register")
+                || path.startsWith("/api/auth/refresh")
+                || path.startsWith("/api/auth/validate");
     }
 
     private Mono<Void> unauthorized(ServerWebExchange exchange) {
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+
+        exchange.getResponse().getHeaders().add(
+                HttpHeaders.WWW_AUTHENTICATE,
+                "Bearer"
+        );
+
         return exchange.getResponse().setComplete();
     }
 
