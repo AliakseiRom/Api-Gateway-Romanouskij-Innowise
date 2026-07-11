@@ -1,9 +1,15 @@
 FROM maven:3.9-eclipse-temurin-21 AS build
 
 WORKDIR /app
-COPY . .
+COPY pom.xml .
+COPY .mvn .mvn
+COPY mvnw .
 
-RUN mvn clean package -DskipTests
+RUN ./mvnw dependency:go-offline
+
+COPY src src
+
+RUN ./mvnw clean package
 
 FROM eclipse-temurin:21-jdk
 

@@ -19,7 +19,7 @@ public class JwtService {
 
     private static final String ACCESS_TOKEN_TYPE = "accessToken";
 
-    public JwtService(@Value("${spring.jwt.secret}") String secretKey) {
+    public JwtService(@Value("${jwt.secret}") String secretKey) {
         this.secretKey = Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
